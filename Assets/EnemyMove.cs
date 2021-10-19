@@ -5,23 +5,60 @@ using UnityEngine;
 public class EnemyMove : MonoBehaviour
 {
     [SerializeField] private GameObject playerInstance;
+    [SerializeField] private GameObject BulletInstance;
     private Vector3 playerPos;
-    [SerializeField] private float flyHeight = 2;
-    [SerializeField] private float distToPlayer = 1;
+    private Vector3 destination;
+    [SerializeField] private float minY = 1;
+    [SerializeField] private float maxY = 3;
+    [SerializeField] private float minX = 0;
+    [SerializeField] private float maxX = 3;
+    [SerializeField] private float minZ = 1;
+    [SerializeField] private float maxZ = 2;
     [SerializeField] private float speed;
+    [SerializeField] private float rotateSpeed;
 
+    [SerializeField] private float shootTimer;
+    private float timeToShoot;
+
+    private void Start()
+    {
+        destination = NewPos();
+        timeToShoot = shootTimer;
+    }
 
     // Update is called once per frame
     void Update()
     {
-        playerPos = playerInstance.transform.position;
-        float moveX = playerInstance.transform.localPosition.x + distToPlayer;
-        float moveY = flyHeight;
-        float moveZ = playerInstance.transform.position.z;
+        Vector3 camDir = transform.position.normalized;
+        Quaternion camRot = Quaternion.LookRotation(camDir);
+        transform.rotation = camRot;
+        if(transform.position == destination)
+        {
+            destination = NewPos();
+        }
+        else
+        {
+            transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
+        }
+        timeToShoot -= Time.deltaTime;
+        if (timeToShoot <= 0)
+        {
+            Shoot();
+            timeToShoot = shootTimer;
+        }
+    }
 
-        Vector3 moveTo = new Vector3(moveX, moveY, moveZ);
-        transform.Translate(moveTo * Time.deltaTime * speed);
+    private Vector3 NewPos()
+    {
+        float posX = playerInstance.transform.position.x + Random.Range(minX, maxX);
+        float posY = playerInstance.transform.position.y + Random.Range(minY, maxY);
+        float posZ = playerInstance.transform.position.z + Random.Range(minZ, maxZ);
+        Vector3 dest = new Vector3(posX, posY, posZ);
+        return dest;
+    }
 
-
+    private void Shoot()
+    {
+        Instantiate(BulletInstance);
     }
 }
