@@ -6,6 +6,7 @@ public class EnemyMove : MonoBehaviour
 {
     [SerializeField] private GameObject playerInstance;
     [SerializeField] private GameObject BulletInstance;
+    [SerializeField] private GameObject shootPoint;
     private Vector3 playerPos;
     private Vector3 destination;
     [SerializeField] private float minY = 1;
@@ -59,6 +60,6 @@ public class EnemyMove : MonoBehaviour
 
     private void Shoot()
     {
-        Instantiate(BulletInstance);
+        Instantiate(BulletInstance, shootPoint.transform.position, shootPoint.transform.rotation);
     }
 }
