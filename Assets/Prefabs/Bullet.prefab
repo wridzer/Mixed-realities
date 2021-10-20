@@ -110,7 +110,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 968dc6cf266539e44955b7b003890731, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireSpeed: 20
+  fireSpeed: 5
+  despawnTimer: 3
+  playerInstance: {fileID: 107946, guid: dc06161b6d97feb419f45f03b62e14b9, type: 3}
 --- !u!54 &6678871559949727159
 Rigidbody:
   m_ObjectHideFlags: 0

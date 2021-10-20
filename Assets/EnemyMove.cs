@@ -60,6 +60,7 @@ public class EnemyMove : MonoBehaviour
 
     private void Shoot()
     {
-        Instantiate(BulletInstance, shootPoint.transform.position, shootPoint.transform.rotation);
+        Quaternion bulletRot = Quaternion.Euler(shootPoint.transform.eulerAngles + new Vector3(90, 0, 0));
+        Instantiate(BulletInstance, shootPoint.transform.position, bulletRot);
     }
 }

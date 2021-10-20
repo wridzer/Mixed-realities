@@ -6,13 +6,15 @@ public class Bullet : MonoBehaviour
 {
     public float fireSpeed = 2f;
     private Rigidbody rb;
+    [SerializeField] private float despawnTimer = 3f;
+    [SerializeField] private GameObject playerInstance;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-
+        Vector3 _playerPos = GameObject.Find("VRCamera").transform.position;
         // set our laser on its merry way. no need to update transform manually
-        rb.velocity = Vector3.forward * fireSpeed;
+        rb.AddForce(((transform.position - _playerPos)+ new Vector3(0, 0, -1)) * fireSpeed);
 
         // freeze the rotation so it doesnt go spinning after a collision
         rb.freezeRotation = true;
@@ -25,21 +27,36 @@ public class Bullet : MonoBehaviour
     {
         // because we want the velocity after physics, we put this in fixed update
         oldVelocity = rb.velocity;
+
+        despawnTimer -= Time.deltaTime;
+        if (despawnTimer <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
     // when a collision happens
     void OnCollisionEnter(Collision collision)
     {
-        // get the point of contact
-        ContactPoint contact = collision.contacts[0];
+        if (collision.transform.tag == "lightsaber")
+        {
 
-        // reflect our old velocity off the contact point's normal vector
-        Vector3 reflectedVelocity = Vector3.Reflect(oldVelocity, contact.normal);
+            // get the point of contact
+            ContactPoint contact = collision.contacts[0];
 
-        // assign the reflected velocity back to the rigidbody
-        rb.velocity = reflectedVelocity;
-        Quaternion rotation = Quaternion.FromToRotation(oldVelocity, reflectedVelocity);
-        transform.rotation = rotation * transform.rotation;
+            // reflect our old velocity off the contact point's normal vector
+            Vector3 reflectedVelocity = Vector3.Reflect(oldVelocity, contact.normal);
+
+            // assign the reflected velocity back to the rigidbody
+            rb.velocity = reflectedVelocity;
+            Quaternion rotation = Quaternion.FromToRotation(oldVelocity, reflectedVelocity);
+            transform.rotation = rotation * transform.rotation;
+
+        }
+        else
+        {
+            //Destroy(gameObject);
+        }
     }
 
 }
