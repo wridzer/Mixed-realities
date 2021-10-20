@@ -7,16 +7,23 @@ public class Bullet : MonoBehaviour
     public float fireSpeed = 2f;
     private Rigidbody rb;
     [SerializeField] private float despawnTimer = 3f;
-    [SerializeField] private GameObject playerInstance;
+    private Vector3 _playerPos;
+    private AudioSource audioSource;
+
+    [SerializeField] private AudioClip reflectSF;
+    [SerializeField] private AudioClip missSF;
+    [SerializeField] private AudioClip hurtSF;
+
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        Vector3 _playerPos = GameObject.Find("VRCamera").transform.position;
-        // set our laser on its merry way. no need to update transform manually
-        rb.AddForce(((transform.position - _playerPos)+ new Vector3(0, 0, -1)) * fireSpeed);
+        audioSource = GetComponent<AudioSource>();
+        _playerPos = GameObject.Find("VRCamera").transform.position;
 
-        // freeze the rotation so it doesnt go spinning after a collision
+        Quaternion rotationAngle = Quaternion.LookRotation(_playerPos - transform.position);
+        transform.rotation = rotationAngle;
+
         rb.freezeRotation = true;
     }
 
@@ -26,7 +33,8 @@ public class Bullet : MonoBehaviour
     void FixedUpdate()
     {
         // because we want the velocity after physics, we put this in fixed update
-        oldVelocity = rb.velocity;
+
+        transform.Translate(Vector3.forward * fireSpeed * Time.deltaTime);
 
         despawnTimer -= Time.deltaTime;
         if (despawnTimer <= 0)
@@ -52,10 +60,31 @@ public class Bullet : MonoBehaviour
             Quaternion rotation = Quaternion.FromToRotation(oldVelocity, reflectedVelocity);
             transform.rotation = rotation * transform.rotation;
 
+            audioSource.PlayOneShot(reflectSF);
         }
-        else
+        if (collision.transform.tag == "Player")
         {
-            //Destroy(gameObject);
+            GetComponentInChildren<MeshRenderer>().enabled = false;
+            GetComponent<Collider>().enabled = false;
+            audioSource.PlayOneShot(hurtSF);
+            Destroy();
+        }
+        if (collision.transform.tag != "Player" && collision.transform.tag != "lightsaber")
+        {
+            GetComponentInChildren<MeshRenderer>().enabled = false;
+            GetComponent<Collider>().enabled = false;
+            audioSource.PlayOneShot(missSF);
+            Destroy();
+        }
+    }
+
+    public void Destroy()
+    {
+        float _timer = 5;
+        _timer -= Time.deltaTime;
+        if (_timer <= 0)
+        {
+            Destroy(gameObject);
         }
     }
 

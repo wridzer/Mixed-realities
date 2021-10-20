@@ -19,21 +19,21 @@ public class EnemyMove : MonoBehaviour
     [SerializeField] private float rotateSpeed;
 
     [SerializeField] private float shootTimer;
+    [SerializeField] private float shootTimerOnStart = 15f;
     private float timeToShoot;
 
     private void Start()
     {
         destination = NewPos();
-        timeToShoot = shootTimer;
+        timeToShoot = shootTimerOnStart;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 camDir = transform.position.normalized;
-        Quaternion camRot = Quaternion.LookRotation(camDir);
-        transform.rotation = camRot;
-        if(transform.position == destination)
+        Quaternion rotationAngle = Quaternion.LookRotation(playerInstance.transform.position - transform.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, rotationAngle, Time.deltaTime * rotateSpeed);
+        if (transform.position == destination)
         {
             destination = NewPos();
         }
