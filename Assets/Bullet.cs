@@ -14,7 +14,7 @@ public class Bullet : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         Vector3 _playerPos = GameObject.Find("VRCamera").transform.position;
         // set our laser on its merry way. no need to update transform manually
-        rb.velocity = ((transform.position - _playerPos)+ new Vector3(0, 0, -1)) * fireSpeed;
+        rb.AddForce(((transform.position - _playerPos)+ new Vector3(0, 0, -1)) * fireSpeed);
 
         // freeze the rotation so it doesnt go spinning after a collision
         rb.freezeRotation = true;
